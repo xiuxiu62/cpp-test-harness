@@ -1,21 +1,41 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.14)
+project(test_harness VERSION 0.1.0 LANGUAGES CXX)
 
-file(GLOB_RECURSE HEADERS "{CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "{CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
-file(GLOB_RECURSE SOURCES "{CMAKE_CURRENT_SOURCE_DIR}/src/*.c" "{CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+# Specify the C++ standard
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(test-core src/main.cpp)
+# Option to enable testing support
+option(TEST_MODE "Enable testing support" OFF)
 
-function(add_engine_test TEST_NAME TEST_SOURCE)
-  add_executable(${TEST_NAME} ${TEST_SOURCE})
-  target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}_lib)
+file(GLOB_RECURSE PUBLIC_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/test.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/assertions.hpp")
+file(GLOB_RECURSE PRIVATE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/test_impl.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/assertions_impl.hpp")
 
-  if(USE_CATCH2)
-    target_link_libraries(${TEST_NAME} PRIVATE Catch2::Catch2WithMain)
-  endif()
+# Create the library
+add_library(test_harness INTERFACE)
 
-  # Add the test so it can be run with ctest
-  add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+set(PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/public")
+set(PRIVATE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/private")
 
-  # Optional: Set timeouts or other test properties
-  set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 30)
-endfunction()
+# Configure include directories - note the syntax fix
+target_include_directories(test_harness
+    PRIVATE
+        ${PRIVATE_INCLUDE_DIR}
+    PUBLIC 
+        ${PUBLIC_INCLUDE_DIR}
+)
+
+# Set compile definitions based on TEST_MODE option
+if(TEST_MODE)
+    target_compile_definitions(test_harness PUBLIC TEST_MODE)
+endif()
+
+# Example tests (optional)
+option(TEST_HARNESS_BUILD_EXAMPLES "Build example tests" OFF)
+if(TEST_HARNESS_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()

@@ -1,11 +1,31 @@
-#include "../include/test.hpp"
+#pragma once
 
+#ifdef TEST_MODE
+
+#include "test.hpp"
 #include <iostream>
+#include <string>
 #include <vector>
+
+typedef bool (*TestFn)();
+
+struct Test {
+    std::string name;
+    const char *local_name;
+    const char *file_path;
+    int line;
+    TestFn fn;
+};
+
+std::string create_test_name(const char *file_path, const char *local_name);
+
+void register_test(const char *local_name, TestFn fn, const char *file_path, int line);
+
+bool run_tests();
 
 static std::vector<Test> tests;
 
-static std::string create_test_name(const char *file_path, const char *local_name) {
+inline std::string create_test_name(const char *file_path, const char *local_name) {
     std::string path(file_path);
     std::string result;
 
@@ -32,7 +52,7 @@ static std::string create_test_name(const char *file_path, const char *local_nam
     return path + "::" + local_name;
 }
 
-static void register_test(const char *local_name, TestFn fn, const char *file_path, int line) {
+inline void register_test(const char *local_name, TestFn fn, const char *file_path, int line) {
     auto name = create_test_name(file_path, local_name);
     tests.push_back({
         .name = name,
@@ -43,7 +63,7 @@ static void register_test(const char *local_name, TestFn fn, const char *file_pa
     });
 }
 
-static bool run_tests() {
+inline bool run_tests() {
     auto test_count = tests.size();
 
     std::cout << "running " << test_count << " test";
@@ -82,11 +102,4 @@ static bool run_tests() {
     return failures == 0;
 }
 
-#define TEST(name)                                                                                                     \
-    static bool test_func_##name(void);                                                                                \
-    struct RegisterTest_##name {                                                                                       \
-        RegisterTest_##name() {                                                                                        \
-            register_test(#name, test_func_##name, __FILE__, __LINE__);                                                \
-        }                                                                                                              \
-    } register_test_##name;                                                                                            \
-    static bool test_func_##name()
+#endif

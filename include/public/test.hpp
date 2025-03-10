@@ -1,22 +1,8 @@
 #pragma once
 
-#include <string>
+#ifdef TEST_MODE
 
-typedef bool (*TestFn)();
-
-struct Test {
-    std::string name;
-    const char *local_name;
-    const char *file_path;
-    int line;
-    TestFn fn;
-};
-
-static std::string create_test_name(const char *file_path, const char *local_name);
-
-static void register_test(const char *local_name, TestFn fn, const char *file_path, int line);
-
-static bool run_tests();
+#include "../private/test_impl.hpp"
 
 #define TEST(name)                                                                                                     \
     static bool test_func_##name(void);                                                                                \
@@ -26,3 +12,9 @@ static bool run_tests();
         }                                                                                                              \
     } register_test_##name;                                                                                            \
     static bool test_func_##name()
+
+#else
+
+#define TEST(name) static void test_func_##name(void) __attribute__((unused))
+
+#endif

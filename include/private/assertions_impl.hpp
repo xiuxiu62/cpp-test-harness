@@ -1,10 +1,13 @@
-#include "../include/assertions.hpp"
+#pragma once
 
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #define EPSILON 1e-6
+
+template <typename T> struct is_floating_point_like : std::is_floating_point<T> {};
 
 template <typename T> std::string to_string(const T &val) {
     std::ostringstream oss;
