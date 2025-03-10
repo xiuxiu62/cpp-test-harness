@@ -2,7 +2,6 @@
 
 #ifdef TEST_MODE
 
-#include "test.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -16,12 +15,6 @@ struct Test {
     int line;
     TestFn fn;
 };
-
-std::string create_test_name(const char *file_path, const char *local_name);
-
-void register_test(const char *local_name, TestFn fn, const char *file_path, int line);
-
-bool run_tests();
 
 static std::vector<Test> tests;
 
@@ -63,7 +56,7 @@ inline void register_test(const char *local_name, TestFn fn, const char *file_pa
     });
 }
 
-inline bool run_tests() {
+inline int run_tests(int argc, char **argv) {
     auto test_count = tests.size();
 
     std::cout << "running " << test_count << " test";
@@ -88,10 +81,10 @@ inline bool run_tests() {
 
     std::cout << std::endl;
     if (failures > 0) {
-        std::cout << "failures:" << std::endl;
-        std::cout << std::endl;
+        // std::cout << "failures:" << std::endl;
+        // std::cout << std::endl;
 
-        // TODO: store and print failure messages
+        // TODO: store and print formatted failure messages
 
         std::cout << "test result: FAILED. " << (test_count - failures) << " passed; " << failures << " failed"
                   << std::endl;
