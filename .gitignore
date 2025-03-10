@@ -1,0 +1,4 @@
+/build
+/.cache
+/tests
+compile_commands.json
