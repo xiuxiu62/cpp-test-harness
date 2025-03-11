@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(TEST_MODE "Enable testing support" OFF)
+option(TEST_HARNESS_BUILD_EXAMPLES "Build example tests" OFF)
 
 if(TEST_MODE)
     set(TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
@@ -21,7 +22,6 @@ else()
     target_include_directories(test_harness INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/public)
 endif()
 
-option(TEST_HARNESS_BUILD_EXAMPLES "Build example tests" OFF)
 if(TEST_HARNESS_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
